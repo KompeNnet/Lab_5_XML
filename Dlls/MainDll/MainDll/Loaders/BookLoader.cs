@@ -219,7 +219,8 @@ namespace Lab_4.Loaders
             StreamReader reader = new StreamReader(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + ".mys");
             try
             {
-                Structure signature = Serializer.Deserialize<Structure>(reader.ReadLine());
+                ISerializer serializer = SerializerManager.GetSerializer("json");
+                Structure signature = serializer.Deserialize<Structure>(reader.ReadLine());
                 reader.Dispose();
                 reader = new StreamReader(path);
                 Structure plugin = new Structure()

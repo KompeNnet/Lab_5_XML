@@ -61,9 +61,9 @@
     <Compile Include="Helpers\IPlugin.cs" />
     <Compile Include="Helpers\ItemInList.cs" />
     <Compile Include="Helpers\LoaderManager.cs" />
+    <Compile Include="Helpers\Serialization\IFormatPlugin.cs" />
     <Compile Include="Helpers\Serialization\ISerializer.cs" />
     <Compile Include="Helpers\Serialization\JSONSerializer.cs" />
-    <Compile Include="Helpers\Serialization\Serializer.cs" />
     <Compile Include="Helpers\Serialization\SerializerManager.cs" />
     <Compile Include="Loaders\BookLoader.cs" />
     <Compile Include="Loaders\EncyclopediaLoader.cs" />
