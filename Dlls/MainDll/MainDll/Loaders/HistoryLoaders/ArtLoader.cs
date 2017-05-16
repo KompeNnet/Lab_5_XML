@@ -49,9 +49,9 @@ namespace Lab_4.Loaders.HistoryLoaders
             return g;
         }
 
-        public override Book Deserialize(string d)
+        public override Book Deserialize(string d, ISerializer serializer)
         {
-            return Serializer.Deserialize<Art>(d);
+            return serializer.Deserialize<Art>(d);
         }
     }
 }

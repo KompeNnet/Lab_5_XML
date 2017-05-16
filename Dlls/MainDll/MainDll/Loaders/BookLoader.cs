@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using Lab_4.Books;
 using Lab_4.Helpers;
 using Lab_4.Helpers.Serialization;
-using System.Security.Cryptography;
 
 namespace Lab_4.Loaders
 {
@@ -131,17 +131,20 @@ namespace Lab_4.Loaders
             Grid g = (Grid)gr.Parent;
             ListView bookListForm = g.Children.OfType<ListView>().First(x => x.Name == "BookListForm");
 
-            SaveFileDialog dlg = new SaveFileDialog()
+            SaveFileDialog dlg = new SaveFileDialog() { FileName = "bookList.json" };
+            foreach (string item in SerializerManager.availableFormats)
             {
-                Filter = "JSON files | *.json",
-                FileName = "bookList.json"
-            };
+                try { dlg.Filter += item.ToUpper() + " files | *." + item; }
+                catch { dlg.Filter += " | " + item.ToUpper() + " files | *." + item; }
+            }
+
             if (dlg.ShowDialog() == true)
             {
                 StreamWriter writer = new StreamWriter(dlg.OpenFile());
+                ISerializer serializer = SerializerManager.GetSerializer((Path.GetExtension(dlg.FileName)).Substring(1));
                 foreach (ItemInList item in bookListForm.SelectedItems)
                 {
-                    writer.WriteLine(item.Type + ":" + Serializer.Serialize(item.Data));
+                    writer.WriteLine(item.Type + ":" + serializer.Serialize(item.Data));
                 }
                 writer.Dispose();
                 writer.Close();
@@ -154,10 +157,17 @@ namespace Lab_4.Loaders
             Grid g = (Grid)gr.Parent;
             ListView bookListForm = g.Children.OfType<ListView>().First(x => x.Name == "BookListForm");
 
-            OpenFileDialog dlg = new OpenFileDialog() { Filter = "JSON files | *.json" };
+            OpenFileDialog dlg = new OpenFileDialog();
+            foreach (string item in SerializerManager.availableFormats)
+            {
+                try { dlg.Filter += item.ToUpper() + " files | *." + item; }
+                catch { dlg.Filter += " | " + item.ToUpper() + " files | *." + item; }
+            }
+
             if (dlg.ShowDialog() == true)
             {
                 StreamReader reader = new StreamReader(dlg.OpenFile());
+                ISerializer serializer = SerializerManager.GetSerializer((Path.GetExtension(dlg.FileName)).Substring(1));
                 string item;
                 string loadingErrors = "";
                 while ((item = reader.ReadLine()) != null)
@@ -168,7 +178,7 @@ namespace Lab_4.Loaders
                         try
                         {
                             var loader = LoaderManager.GetLoader(words[0]);
-                            Book book = loader.Deserialize(item);
+                            Book book = loader.Deserialize(item, serializer);
                             bookListForm.Items.Add(new ItemInList { Type = words[0], Name = book.Name, Author = book.Author, Data = book });
                         }
                         catch
@@ -294,9 +304,9 @@ namespace Lab_4.Loaders
             }
         }
 
-        public virtual Book Deserialize(string d)
+        public virtual Book Deserialize(string d, ISerializer serializer)
         {
-            return Serializer.Deserialize<Book>(d);
+            return serializer.Deserialize<Book>(d);
         }
     }
 }

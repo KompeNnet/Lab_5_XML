@@ -48,9 +48,9 @@ namespace Lab_4.Loaders
             return g;
         }
 
-        public override Book Deserialize(string d)
+        public override Book Deserialize(string d, ISerializer serializer)
         {
-            return Serializer.Deserialize<Encyclopedia>(d);
+            return serializer.Deserialize<Encyclopedia>(d);
         }
     }
 }
