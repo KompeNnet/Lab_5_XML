@@ -249,8 +249,7 @@ namespace Lab_4.Loaders
                 foreach (Type item in pluginTypes)
                 {
                     IFormatPlugin plugin = Activator.CreateInstance(item) as IFormatPlugin;
-                    SerializerManager.availableFormats.Add(plugin.GetName());
-                    SerializerManager.serializersDict.Add(plugin.GetName(), plugin.GetSerializer());
+                    SerializerManager.LoadFormat(plugin.GetName(), plugin.GetSerializer());
                 }
             }
         }

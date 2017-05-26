@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Lab_4.Helpers.Serialization;
+using System.Windows;
 
 namespace Lab_4.Helpers.Serialization
 {
@@ -19,9 +16,17 @@ namespace Lab_4.Helpers.Serialization
             "json"
         };
 
-        public static void LoadFormat()
+        public static void LoadFormat(string type, ISerializer serializer)
         {
-            //TODO
+            try
+            {
+                serializersDict.Add(type, serializer);
+                availableFormats.Add(type);
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("It is already exists", "Can't add", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public static ISerializer GetSerializer(string key)
