@@ -135,7 +135,7 @@ namespace Lab_4.Loaders
             foreach (string item in SerializerManager.availableFormats)
             {
                 try { dlg.Filter += item.ToUpper() + " files | *." + item; }
-                catch { dlg.Filter += " | " + item.ToUpper() + " files | *." + item; }
+                catch { dlg.Filter += "| " + item.ToUpper() + " files | *." + item; }
             }
 
             if (dlg.ShowDialog() == true)
@@ -161,7 +161,7 @@ namespace Lab_4.Loaders
             foreach (string item in SerializerManager.availableFormats)
             {
                 try { dlg.Filter += item.ToUpper() + " files | *." + item; }
-                catch { dlg.Filter += " | " + item.ToUpper() + " files | *." + item; }
+                catch { dlg.Filter += "| " + item.ToUpper() + " files | *." + item; }
             }
 
             if (dlg.ShowDialog() == true)
@@ -240,6 +240,40 @@ namespace Lab_4.Loaders
             }
         }
 
+        private void LoadSerializerPlugin(OpenFileDialog dlg)
+        {
+            Assembly mainAssembly = Assembly.LoadFrom(dlg.FileName);
+            List<Type> pluginTypes = GetTypes<IFormatPlugin>(mainAssembly);
+            if (pluginTypes.Count != 0)
+            {
+                foreach (Type item in pluginTypes)
+                {
+                    IFormatPlugin plugin = Activator.CreateInstance(item) as IFormatPlugin;
+                    SerializerManager.availableFormats.Add(plugin.GetName());
+                    SerializerManager.serializersDict.Add(plugin.GetName(), plugin.GetSerializer());
+                }
+            }
+        }
+
+        private void LoadBookPlugin(OpenFileDialog dlg)
+        {
+            Assembly mainAssembly = Assembly.LoadFrom(dlg.FileName);
+            List<Type> pluginTypes = GetTypes<IPlugin>(mainAssembly);
+            if (pluginTypes.Count != 0)
+            {
+                foreach (Type item in pluginTypes)
+                {
+                    IPlugin plugin = Activator.CreateInstance(item) as IPlugin;
+                    LoaderManager.AddLoader(plugin.GetName(), plugin.GetParent(), plugin.GetHierarchy());
+                }
+            }
+        }
+
+        private void LoadFormatterPlugin(OpenFileDialog dlg)
+        {
+
+        }
+
         private void BtnLoadPlugin_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog()
@@ -250,16 +284,17 @@ namespace Lab_4.Loaders
             {
                 if (CheckPluginSignature(dlg.FileName))
                 {
-                    Assembly mainAssembly = Assembly.LoadFrom(dlg.FileName);
-                    List<Type> pluginTypes = GetTypes<IPlugin>(mainAssembly);
-                    if (pluginTypes.Count != 0)
+                    if ((dlg.FileName).Contains("Serializer"))
                     {
-                        foreach (Type item in pluginTypes)
-                        {
-                            IPlugin plugin = Activator.CreateInstance(item) as IPlugin;
-                            LoaderManager.AddLoader(plugin.GetName(), plugin.GetParent(), plugin.GetHierarchy());
-                        }
+                        LoadSerializerPlugin(dlg);
                     }
+                    else
+                    if ((dlg.FileName).Contains("Formatter"))
+                    {
+                        LoadFormatterPlugin(dlg);
+                    }
+                    else LoadBookPlugin(dlg);
+                    
                     GroupBox gr = GetMainGroupBox(sender);                  // MainGroupBox
                     Grid g = (Grid)gr.Parent;                               // MainGrid
 

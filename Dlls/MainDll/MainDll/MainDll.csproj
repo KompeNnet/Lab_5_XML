@@ -76,6 +76,8 @@
     <Compile Include="Loaders\HistoryLoaders\ArtLoader.cs" />
     <Compile Include="Loaders\HistoryLoaders\BiographyLoader.cs" />
     <Compile Include="Helpers\Structure.cs" />
+    <Compile Include="Helpers\PluginTypes.cs" />
+    <Compile Include="Loaders\IFormatterPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

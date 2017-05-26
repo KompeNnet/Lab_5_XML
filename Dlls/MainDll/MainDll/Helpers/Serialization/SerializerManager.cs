@@ -9,7 +9,7 @@ namespace Lab_4.Helpers.Serialization
 {
     public class SerializerManager
     {
-        private static Dictionary<string, ISerializer> serializersDict = new Dictionary<string, ISerializer>
+        public static Dictionary<string, ISerializer> serializersDict = new Dictionary<string, ISerializer>
         {
             { "json", new JSONSerializer() }
         };
