@@ -1,5 +1,8 @@
-﻿namespace Lab_4.Books
+﻿using System;
+
+namespace Lab_4.Books
 {
+    [Serializable]
     public class Encyclopedia : Book
     {
         public string Subject { get; set; }

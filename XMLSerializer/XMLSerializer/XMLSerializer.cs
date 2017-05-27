@@ -6,10 +6,9 @@ namespace Lab_4.Helpers.Serialization
 {
     class XMLSerializer : ISerializer
     {
-
         public string Serialize(Book smth)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(Book));
+            XmlSerializer serializer = new XmlSerializer(typeof(Book), LoaderManager.GetTypes());
             StringWriter writer = new StringWriter();
             serializer.Serialize(writer, smth);
             return writer.ToString();

@@ -1,5 +1,8 @@
-﻿namespace Lab_4.Books.History
+﻿using System;
+
+namespace Lab_4.Books.History
 {
+    [Serializable]
     public class Biography : Historical
     {
         public string Person { get; set; }

@@ -216,9 +216,9 @@ namespace Lab_4.Loaders
 
         public bool CheckPluginSignature(string path)
         {
-            StreamReader reader = new StreamReader(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + ".mys");
             try
             {
+                StreamReader reader = new StreamReader(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + ".mys");
                 ISerializer serializer = SerializerManager.GetSerializer("json");
                 Structure signature = serializer.Deserialize<Structure>(reader.ReadLine());
                 reader.Dispose();
@@ -270,7 +270,7 @@ namespace Lab_4.Loaders
 
         private void LoadFormatterPlugin(OpenFileDialog dlg)
         {
-
+            //TODO
         }
 
         private void BtnLoadPlugin_Click(object sender, RoutedEventArgs e)
@@ -292,8 +292,10 @@ namespace Lab_4.Loaders
                     {
                         LoadFormatterPlugin(dlg);
                     }
-                    else LoadBookPlugin(dlg);
-                    
+                    else
+                        try { LoadBookPlugin(dlg); }
+                        catch { MessageBox.Show("Correct plugin? 're you shure?", "Smth wrong!", MessageBoxButton.OK, MessageBoxImage.Error); }
+
                     GroupBox gr = GetMainGroupBox(sender);                  // MainGroupBox
                     Grid g = (Grid)gr.Parent;                               // MainGrid
 

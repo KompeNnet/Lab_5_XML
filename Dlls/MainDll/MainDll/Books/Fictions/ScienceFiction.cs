@@ -1,5 +1,8 @@
-﻿namespace Lab_4.Books.Fictions
+﻿using System;
+
+namespace Lab_4.Books.Fictions
 {
+    [Serializable]
     public class ScienceFiction : FantasticTales
     {
         public bool IsEarth { get; set; }
