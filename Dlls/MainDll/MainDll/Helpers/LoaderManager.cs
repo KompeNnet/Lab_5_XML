@@ -60,6 +60,7 @@ namespace Lab_4.Helpers
             try
             {
                 int count = types.Length;
+                Array.Resize(ref types, count + 1);
                 types[count] = Type.GetType(key);
                 loaderDict.Add(key, member);
                 loaderDict[parent].BookChild.Add(key);
