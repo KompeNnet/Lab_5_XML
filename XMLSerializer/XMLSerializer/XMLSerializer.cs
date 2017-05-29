@@ -1,4 +1,5 @@
 ﻿using Lab_4.Books;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -17,7 +18,8 @@ namespace Lab_4.Helpers.Serialization
         public T Deserialize<T>(string smth)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
-            StringReader reader = new StringReader(smth);
+            smth = smth.Substring(0, smth.Length - 1);
+            TextReader reader = new StringReader(smth);
             return (T)serializer.Deserialize(reader);
         }
     }

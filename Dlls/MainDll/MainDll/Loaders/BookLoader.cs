@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using Lab_4.Books;
@@ -144,7 +145,7 @@ namespace Lab_4.Loaders
                 ISerializer serializer = SerializerManager.GetSerializer((Path.GetExtension(dlg.FileName)).Substring(1));
                 foreach (ItemInList item in bookListForm.SelectedItems)
                 {
-                    writer.WriteLine(item.Type + ":" + serializer.Serialize(item.Data));
+                    writer.WriteLine(" : " + item.Type + " : " + serializer.Serialize(item.Data));
                 }
                 writer.Dispose();
                 writer.Close();
@@ -170,29 +171,33 @@ namespace Lab_4.Loaders
                 ISerializer serializer = SerializerManager.GetSerializer((Path.GetExtension(dlg.FileName)).Substring(1));
                 string item;
                 string loadingErrors = "";
-                while ((item = reader.ReadLine()) != null)
+                try
                 {
-                    string[] words = item.Split(':');
-                    item = item.Substring(words[0].Length + 1, item.Length - words[0].Length - 1);
+                    item = reader.ReadToEnd();
+                    string[] words = Regex.Split(item, " : ");
+                    for (int i = 1; i < words.Count(); i += 2)
                     {
+                        item = words[i + 1];
                         try
                         {
-                            var loader = LoaderManager.GetLoader(words[0]);
+                            var loader = LoaderManager.GetLoader(words[i]);
                             Book book = loader.Deserialize(item, serializer);
-                            bookListForm.Items.Add(new ItemInList { Type = words[0], Name = book.Name, Author = book.Author, Data = book });
+                            bookListForm.Items.Add(new ItemInList { Type = words[i], Name = book.Name, Author = book.Author, Data = book });
                         }
                         catch
                         {
-                            loadingErrors += words[0] + "\n";
+                            loadingErrors += words[i] + "\n";
                         }
                     }
+                    if (loadingErrors != "")
+                    {
+                        MessageBox.Show(loadingErrors, "Unknown types were not serializated:", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
+                catch { MessageBox.Show("Smth wrong with loaded file. Please, try again.", "Oups!", MessageBoxButton.OK, MessageBoxImage.Error); }
+                
                 reader.Dispose();
                 reader.Close();
-                if (loadingErrors != "")
-                {
-                    MessageBox.Show(loadingErrors, "Unknown types were not serializated:", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
             }
         }
 
