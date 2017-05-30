@@ -17,8 +17,7 @@ namespace Lab_4.Helpers.Serialization
 
         public T Deserialize<T>(string smth)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-            smth = smth.Substring(0, smth.Length - 1);
+            XmlSerializer serializer = new XmlSerializer(typeof(Book), LoaderManager.GetTypes());
             TextReader reader = new StringReader(smth);
             return (T)serializer.Deserialize(reader);
         }

@@ -221,7 +221,7 @@ namespace Lab_4.Loaders
 
         public bool CheckPluginSignature(string path)
         {
-            try
+            /*try
             {
                 StreamReader reader = new StreamReader(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + ".mys");
                 ISerializer serializer = SerializerManager.GetSerializer("json");
@@ -242,7 +242,8 @@ namespace Lab_4.Loaders
             catch
             {
                 return false;
-            }
+            }*/
+            return true;
         }
 
         private void LoadSerializerPlugin(OpenFileDialog dlg)
