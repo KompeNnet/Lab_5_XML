@@ -2,8 +2,6 @@
 {
     public interface IFormatterPlugin
     {
-        string GetStartType();
-        string GetResultType();
         IFormatter GetFormatter();
     }
 }

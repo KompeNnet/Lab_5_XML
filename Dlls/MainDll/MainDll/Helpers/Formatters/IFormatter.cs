@@ -3,5 +3,6 @@
     public interface IFormatter
     {
         string Format(string input);
+        string ReFormat(string input);
     }
 }

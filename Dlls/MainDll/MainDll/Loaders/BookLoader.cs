@@ -11,11 +11,14 @@ using System.Windows.Controls;
 using Lab_4.Books;
 using Lab_4.Helpers;
 using Lab_4.Helpers.Serialization;
+using Lab_4.Helpers.Formatters;
 
 namespace Lab_4.Loaders
 {
     public class BookLoader
     {
+        private string transformRules;
+
         public virtual Book Create(GroupBox g)
         {
             Book b = new Book();
@@ -274,33 +277,75 @@ namespace Lab_4.Loaders
             }
         }
 
-        private void LoadFormatterPlugin(OpenFileDialog dlg)
+        private void LoadFormatterPlugin(OpenFileDialog dlg, object sender)
         {
-            //TODO
+            Assembly mainAssembly = Assembly.LoadFrom(dlg.FileName);
+            List<Type> pluginTypes = GetTypes<IFormatterPlugin>(mainAssembly);
+            if (pluginTypes.Count != 0)
+            {
+                bool isUploadNeeded = false;
+                foreach (Type item in pluginTypes)
+                {
+                    IFormatterPlugin plugin = Activator.CreateInstance(item) as IFormatterPlugin;
+                    isUploadNeeded = FormatterManager.LoadFormat(plugin.GetFormatter());
+                }
+                if (isUploadNeeded)
+                {
+                    GroupBox gr = GetMainGroupBox(sender);
+                    Grid g = (Grid)gr.Parent;
+
+                    Menu menu = new Menu();
+                    try { menu = g.Children.OfType<Menu>().First(x => x.Name == "Transformation"); }
+                    catch { menu = AddMenu(sender, g); }
+
+                    MenuItem menuItem = new MenuItem() { Header = "Transform" };
+                    menuItem.Items.Add(new MenuItem() { Header = "Is enabled", IsCheckable = true });
+
+                    MenuItem tempItem = new MenuItem() { Header = "ChooseRules" };
+                    tempItem.Click += new RoutedEventHandler(ChooseRules);
+                    menuItem.Items.Add(tempItem);
+
+                    menu.Items.Add(menuItem);
+                }
+            }
+        }
+
+        private void ChooseRules(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog() { Filter = "XSL files | *.xsl" };
+            if (dlg.ShowDialog() == true)
+            {
+                transformRules = dlg.FileName;
+                ((MenuItem)sender).Header = "Chosen " + Path.GetFileName(transformRules);
+            }
+        }
+
+        private Menu AddMenu(object sender, Grid g)
+        {
+            Menu menu = new Menu()
+            {
+                Margin = new Thickness(0, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Top,
+                Height = 21,
+                Name = "Transformation"
+            };
+            g.Children.Add(menu);
+            return menu;
         }
 
         private void BtnLoadPlugin_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog()
-            {
-                Filter = "DLL files | *.dll"
-            };
+            OpenFileDialog dlg = new OpenFileDialog() { Filter = "DLL files | *.dll" };
             if (dlg.ShowDialog() == true)
             {
                 if (CheckPluginSignature(dlg.FileName))
                 {
-                    if ((dlg.FileName).Contains("Serializer"))
-                    {
-                        LoadSerializerPlugin(dlg);
-                    }
+                    if ((dlg.FileName).Contains("Serializer")) { LoadSerializerPlugin(dlg); }
                     else
-                    if ((dlg.FileName).Contains("Formatter"))
-                    {
-                        LoadFormatterPlugin(dlg);
-                    }
-                    else
-                        try { LoadBookPlugin(dlg); }
-                        catch { MessageBox.Show("Correct plugin? 're you shure?", "Smth wrong!", MessageBoxButton.OK, MessageBoxImage.Error); }
+                        if ((dlg.FileName).Contains("Formatter")) { LoadFormatterPlugin(dlg, sender); }
+                        else
+                            try { LoadBookPlugin(dlg); }
+                            catch { MessageBox.Show("Correct plugin? 're you shure?", "Smth wrong!", MessageBoxButton.OK, MessageBoxImage.Error); }
 
                     GroupBox gr = GetMainGroupBox(sender);                  // MainGroupBox
                     Grid g = (Grid)gr.Parent;                               // MainGrid
