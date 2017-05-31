@@ -17,8 +17,6 @@ namespace Lab_4.Loaders
 {
     public class BookLoader
     {
-        private string transformRules;
-
         public virtual Book Create(GroupBox g)
         {
             Book b = new Book();
@@ -144,12 +142,15 @@ namespace Lab_4.Loaders
 
             if (dlg.ShowDialog() == true)
             {
-                StreamWriter writer = new StreamWriter(dlg.OpenFile());
+                TextWriter writer = new StringWriter();
                 ISerializer serializer = SerializerManager.GetSerializer((Path.GetExtension(dlg.FileName)).Substring(1));
-                foreach (ItemInList item in bookListForm.SelectedItems)
+                foreach (ItemInList item in bookListForm.SelectedItems) { writer.WriteLine(" : " + item.Type + " : " + serializer.Serialize(item.Data)); }
+                Menu menu = new Menu();
+                try
                 {
-                    writer.WriteLine(" : " + item.Type + " : " + serializer.Serialize(item.Data));
+                    menu = g.Children.OfType<Menu>().First(x => x.Name == "Formattions");
                 }
+                catch {  }
                 writer.Dispose();
                 writer.Close();
             }
@@ -279,44 +280,29 @@ namespace Lab_4.Loaders
 
         private void LoadFormatterPlugin(OpenFileDialog dlg, object sender)
         {
+            GroupBox gr = GetMainGroupBox(sender);
+            Grid g = (Grid)gr.Parent;
+
+            Menu menu = new Menu();
+            try { menu = g.Children.OfType<Menu>().First(x => x.Name == "Formattions"); }
+            catch { menu = AddMenu(sender, g); }
             Assembly mainAssembly = Assembly.LoadFrom(dlg.FileName);
             List<Type> pluginTypes = GetTypes<IFormatterPlugin>(mainAssembly);
+
             if (pluginTypes.Count != 0)
             {
-                bool isUploadNeeded = false;
                 foreach (Type item in pluginTypes)
                 {
                     IFormatterPlugin plugin = Activator.CreateInstance(item) as IFormatterPlugin;
-                    isUploadNeeded = FormatterManager.LoadFormat(plugin.GetFormatter());
+                    if (FormatterManager.AddFormatter(plugin.GetFunc(), plugin.GetFormatter()))
+                    {
+                        foreach (string key in FormatterManager.GetFormatters().Keys)
+                        {
+                            menu.Items.Add(plugin.GetMenuItem());
+                            //TODO
+                        }
+                    }
                 }
-                if (isUploadNeeded)
-                {
-                    GroupBox gr = GetMainGroupBox(sender);
-                    Grid g = (Grid)gr.Parent;
-
-                    Menu menu = new Menu();
-                    try { menu = g.Children.OfType<Menu>().First(x => x.Name == "Transformation"); }
-                    catch { menu = AddMenu(sender, g); }
-
-                    MenuItem menuItem = new MenuItem() { Header = "Transform" };
-                    menuItem.Items.Add(new MenuItem() { Header = "Is enabled", IsCheckable = true });
-
-                    MenuItem tempItem = new MenuItem() { Header = "ChooseRules" };
-                    tempItem.Click += new RoutedEventHandler(ChooseRules);
-                    menuItem.Items.Add(tempItem);
-
-                    menu.Items.Add(menuItem);
-                }
-            }
-        }
-
-        private void ChooseRules(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog dlg = new OpenFileDialog() { Filter = "XSL files | *.xsl" };
-            if (dlg.ShowDialog() == true)
-            {
-                transformRules = dlg.FileName;
-                ((MenuItem)sender).Header = "Chosen " + Path.GetFileName(transformRules);
             }
         }
 
@@ -327,7 +313,7 @@ namespace Lab_4.Loaders
                 Margin = new Thickness(0, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Top,
                 Height = 21,
-                Name = "Transformation"
+                Name = "Formattions"
             };
             g.Children.Add(menu);
             return menu;

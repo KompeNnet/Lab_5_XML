@@ -56,7 +56,6 @@
     <Compile Include="Books\Historical.cs" />
     <Compile Include="Books\History\Art.cs" />
     <Compile Include="Books\History\Biography.cs" />
-    <Compile Include="Helpers\Formatters\FormatterManager.cs" />
     <Compile Include="Helpers\FormCreator.cs" />
     <Compile Include="Helpers\Hierarchy.cs" />
     <Compile Include="Helpers\Formatters\IFormatter.cs" />
@@ -74,6 +73,7 @@
     <Compile Include="Loaders\FictionsLoaders\FantasticTalesLoader.cs" />
     <Compile Include="Loaders\FictionsLoaders\ScienceFictionLoader.cs" />
     <Compile Include="Loaders\FictionsLoaders\TravellingLoader.cs" />
+    <Compile Include="Helpers\Formatters\FormatterManager.cs" />
     <Compile Include="Loaders\HistoricalLoader.cs" />
     <Compile Include="Loaders\HistoryLoaders\ArtLoader.cs" />
     <Compile Include="Loaders\HistoryLoaders\BiographyLoader.cs" />
