@@ -51,16 +51,7 @@ namespace Lab_4.Loaders
             Button btn = FormCreator.CreateButton("BtnLoadPlugin", "Load plugin", new Thickness(10, 330, 0, 0), BtnLoadPlugin_Click);
             btn.Width = 134;
             g.Children.Add(btn);
-            
-            if (FormatterManager.GetMenuItems().Count != 0)
-            {
-                Menu menu = AddMenu();
-                foreach (MenuItem item in FormatterManager.GetMenuItems())
-                {
-                    menu.Items.Add(item);
-                }
-                g.Children.Add(menu);
-            }
+
             return g;
         }
 
@@ -85,6 +76,23 @@ namespace Lab_4.Loaders
             FrameworkElement parent = (FrameworkElement)((FrameworkElement)o).Parent;
             if (parent.Name == "MainGroup") return (GroupBox)parent;                 // found MainGroupBox
             else return GetMainGroupBox(parent);
+        }
+
+        public void AddMainMenu(object sender)
+        {
+            GroupBox oldGroupBox = GetMainGroupBox(sender);
+            Grid g = (Grid)oldGroupBox.Parent;
+
+            if (FormatterManager.GetMenuItems().Count != 0)
+            {
+                Menu menu = AddMenu();
+                foreach (MenuItem item in FormatterManager.GetMenuItems())
+                {
+                    menu.Items.Add(item);
+                }
+                g.Children.Add(menu);
+            }
+
         }
 
         // EVENTS
@@ -338,7 +346,6 @@ namespace Lab_4.Loaders
             {
                 Margin = new Thickness(0, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Top,
-                Width = 300,
                 Height = 21,
                 Name = "Formattions"
             };
@@ -374,6 +381,7 @@ namespace Lab_4.Loaders
 
                     BookLoader loader = LoaderManager.GetLoader(type);
                     loader.Load(book);
+                    AddMainMenu(sender);
                 }
                 else
                 {
@@ -395,6 +403,7 @@ namespace Lab_4.Loaders
                 var b = LoaderManager.GetLoader(selectedText);      // select Loader
 
                 Grid newGrid = b.Load(b.BaseCreate(oldGroupBox));   // create new Grid
+                AddMainMenu(sender);
                 newGrid.Children.Add(b.CreateButtonsGroup(selectedText));         // add buttons on it
 
                 GroupBox newGroupBox = FormCreator.CreateGroupBox("MainGroup", "Book", new Thickness(0, 0, 0, 0), 887, 384);
