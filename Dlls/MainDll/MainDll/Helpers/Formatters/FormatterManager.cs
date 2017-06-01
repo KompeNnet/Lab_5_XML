@@ -12,6 +12,11 @@ namespace Lab_4.Helpers.Formatters
             return formatterDict;
         }
 
+        public static IFormatter GetByKey(string key)
+        {
+            return formatterDict[key];
+        }
+
         public static bool AddFormatter(string key, IFormatter formatter)
         {
             try { formatterDict.Add(key, formatter); return true; }

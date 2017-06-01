@@ -150,14 +150,21 @@ namespace Lab_4.Loaders
                 {
                     Menu menu = new Menu();
                     menu = g.Children.OfType<Menu>().First(x => x.Name == "Formattions");
+                    string errors = "";
                     foreach (MenuItem item in menu.Items)
                     {
                         MenuItem subItem = (MenuItem)item.Items[0];
+                        IFormatter formatter = FormatterManager.GetByKey(item.Name);
                         if (subItem.IsChecked)
                         {
-
+                            if (formatter.IsCompatible(Path.GetExtension(dlg.FileName)))
+                            {
+                                //TODO
+                            }
+                            else errors += item.Name + "\n";
                         }
                     }
+                    if (errors != "") MessageBox.Show("Incompatible type for:\n" + errors, "Oups!", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch
                 {
