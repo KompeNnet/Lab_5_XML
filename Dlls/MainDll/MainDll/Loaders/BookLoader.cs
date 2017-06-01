@@ -51,7 +51,16 @@ namespace Lab_4.Loaders
             Button btn = FormCreator.CreateButton("BtnLoadPlugin", "Load plugin", new Thickness(10, 330, 0, 0), BtnLoadPlugin_Click);
             btn.Width = 134;
             g.Children.Add(btn);
-
+            
+            if (FormatterManager.GetMenuItems().Count != 0)
+            {
+                Menu menu = AddMenu();
+                foreach (MenuItem item in FormatterManager.GetMenuItems())
+                {
+                    menu.Items.Add(item);
+                }
+                g.Children.Add(menu);
+            }
             return g;
         }
 
@@ -94,7 +103,6 @@ namespace Lab_4.Loaders
                 type = ((GroupBox)temp[temp.Count - 2]).Header.ToString();   // get pre-last GroupBox Header, because last one is ButtonGroupBox
             }
             catch { type = "Book"; }
-
 
             ListView bookListForm = g.Children.OfType<ListView>().First(x => x.Name == "BookListForm"); // find BookListForm
             bookListForm.Items.Add(new ItemInList { Type = type, Name = book.Name, Author = book.Author, Data = book });
@@ -159,7 +167,14 @@ namespace Lab_4.Loaders
                         {
                             if (formatter.IsCompatible(Path.GetExtension(dlg.FileName)))
                             {
-                                //TODO
+                                StreamWriter stream = new StreamWriter(dlg.OpenFile());
+                                string[] words = Regex.Split(writer.ToString(), " : ");
+                                for (int i = 1; i < words.Count(); i += 2)
+                                {
+                                     stream.WriteLine(formatter.Format(words[i]));
+                                }
+                                stream.Dispose();
+                                stream.Close();
                             }
                             else errors += item.Name + "\n";
                         }
@@ -220,8 +235,7 @@ namespace Lab_4.Loaders
                         MessageBox.Show(loadingErrors, "Unknown types were not serializated:", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
-                catch { MessageBox.Show("Smth wrong with loaded file. Please, try again.", "Oups!", MessageBoxButton.OK, MessageBoxImage.Error); }
-                
+                catch { MessageBox.Show("Smth wrong with loaded file. Please, try again.", "Oups!", MessageBoxButton.OK, MessageBoxImage.Error); }                
                 reader.Dispose();
                 reader.Close();
             }
@@ -304,10 +318,7 @@ namespace Lab_4.Loaders
         {
             GroupBox gr = GetMainGroupBox(sender);
             Grid g = (Grid)gr.Parent;
-
-            Menu menu = new Menu();
-            try { menu = g.Children.OfType<Menu>().First(x => x.Name == "Formattions"); }
-            catch { menu = AddMenu(sender, g); }
+            
             Assembly mainAssembly = Assembly.LoadFrom(dlg.FileName);
             List<Type> pluginTypes = GetTypes<IFormatterPlugin>(mainAssembly);
 
@@ -316,27 +327,21 @@ namespace Lab_4.Loaders
                 foreach (Type item in pluginTypes)
                 {
                     IFormatterPlugin plugin = Activator.CreateInstance(item) as IFormatterPlugin;
-                    if (FormatterManager.AddFormatter(plugin.GetFunc(), plugin.GetFormatter()))
-                    {
-                        foreach (string key in FormatterManager.GetFormatters().Keys)
-                        {
-                            menu.Items.Add(plugin.GetMenuItem());
-                        }
-                    }
+                    FormatterManager.AddFormatter(plugin.GetFunc(), plugin.GetFormatter(), plugin.GetMenuItem());
                 }
             }
         }
 
-        private Menu AddMenu(object sender, Grid g)
+        private Menu AddMenu()
         {
             Menu menu = new Menu()
             {
                 Margin = new Thickness(0, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Top,
+                Width = 300,
                 Height = 21,
                 Name = "Formattions"
             };
-            g.Children.Add(menu);
             return menu;
         }
 

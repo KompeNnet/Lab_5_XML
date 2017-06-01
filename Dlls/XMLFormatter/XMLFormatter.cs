@@ -1,14 +1,18 @@
 ﻿using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Xsl;
 
 namespace Lab_4.Helpers.Formatters
 {
     public class XMLFormatter : IFormatter
     {
-        static string formatterRules = "";
+        private static string formatterRules = "";
+        private string extension = "xml";
 
         public bool IsCompatible(string extension)
         {
-            return extension == "xml" ? true : false;
+            return extension == this.extension ? true : false;
         }
 
         public string GetRules()
@@ -23,14 +27,25 @@ namespace Lab_4.Helpers.Formatters
 
         public string Format(string input)
         {
-            //TODO
-            throw new NotImplementedException();
+            XslCompiledTransform myXslTransform = new XslCompiledTransform();
+            myXslTransform.Load(formatterRules);
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(input);
+
+            TextWriter text = new StringWriter();
+
+            myXslTransform.Transform(xmlDoc, null, text);
+            return text.ToString();
         }
 
         public string ReFormat(string input)
         {
-            //TODO
-            throw new NotImplementedException();
+            XslTransform myXslTransform;
+            myXslTransform = new XslTransform();
+            myXslTransform.Load(formatterRules);
+            myXslTransform.Transform(input, "ISBNBookList.xml");
+            return "";
         }
     }
 }

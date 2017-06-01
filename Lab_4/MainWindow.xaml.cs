@@ -3,6 +3,8 @@ using System.Windows.Controls;
 using Lab_4.Books;
 using Lab_4.Helpers;
 using Lab_4.Loaders;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lab_4
 {
@@ -27,7 +29,11 @@ namespace Lab_4
         {
             if (BookListForm.SelectedIndex != -1)
             {
-                MainGrid.Children.RemoveAt(1);
+                IEnumerable<ListView> listList = MainGrid.Children.OfType<ListView>();
+                
+                ListView list = listList.First(x => x.Name == "BookListForm");
+                MainGrid.Children.Clear();
+                MainGrid.Children.Add(list);
 
                 ItemInList elem = (ItemInList)BookListForm.Items.GetItemAt(BookListForm.SelectedIndex);
 
