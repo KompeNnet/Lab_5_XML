@@ -78,11 +78,16 @@ namespace Lab_4.Loaders
             else return GetMainGroupBox(parent);
         }
 
-        public void AddMainMenu(object sender)
+        private void AddMainMenu(object sender)
         {
             GroupBox oldGroupBox = GetMainGroupBox(sender);
             Grid g = (Grid)oldGroupBox.Parent;
+            Menu menu = GetMenu(g);
+            if (menu != null) g.Children.Add(menu);
+        }
 
+        public Menu GetMenu(Grid g)
+        {
             if (FormatterManager.GetMenuItems().Count != 0)
             {
                 Menu menu = AddMenu();
@@ -90,9 +95,9 @@ namespace Lab_4.Loaders
                 {
                     menu.Items.Add(item);
                 }
-                g.Children.Add(menu);
+                return menu;
             }
-
+            else return null;
         }
 
         // EVENTS

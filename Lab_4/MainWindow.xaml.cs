@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using Lab_4.Books;
 using Lab_4.Helpers;
+using Lab_4.Helpers.Formatters;
 using Lab_4.Loaders;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +46,8 @@ namespace Lab_4
                 newGroupBox.Content = g;
 
                 MainGrid.Children.Add(newGroupBox);
+
+                if (FormatterManager.GetFormatters().Count != 0) MainGrid.Children.Add(loader.GetMenu(MainGrid));
             }
         }
     }
