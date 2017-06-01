@@ -83,19 +83,23 @@ namespace Lab_4.Loaders
             GroupBox oldGroupBox = GetMainGroupBox(sender);
             Grid g = (Grid)oldGroupBox.Parent;
             Menu menu = GetMenu(g);
-            if (menu != null) g.Children.Add(menu);
+            if (menu != null)
+            {
+                IEnumerable<Menu> menuList = g.Children.OfType<Menu>();
+                if (menuList.Count() != 0)
+                {
+                    Menu prevMenu = menuList.First(x => x.Name == "Formattions");
+                    g.Children.Remove(prevMenu);
+                }
+                g.Children.Add(menu);
+            }
         }
 
         public Menu GetMenu(Grid g)
         {
-            if (FormatterManager.GetMenuItems().Count != 0)
+            if (FormatterManager.GetFormatters().Count != 0)
             {
-                Menu menu = AddMenu();
-                foreach (MenuItem item in FormatterManager.GetMenuItems())
-                {
-                    menu.Items.Add(item);
-                }
-                return menu;
+                return FormatterManager.GetMenu();
             }
             else return null;
         }
@@ -181,13 +185,15 @@ namespace Lab_4.Loaders
                             if (formatter.IsCompatible(Path.GetExtension(dlg.FileName)))
                             {
                                 StreamWriter stream = new StreamWriter(dlg.OpenFile());
-                                string[] words = Regex.Split(writer.ToString(), " : ");
-                                for (int i = 1; i < words.Count(); i += 2)
+                                try
                                 {
-                                     stream.WriteLine(formatter.Format(words[i]));
+                                    string[] words = Regex.Split(writer.ToString(), " : ");
+                                    for (int i = 2; i < words.Count(); i += 2)
+                                    {
+                                        stream.WriteLine(formatter.Format(words[i]));
+                                    }
                                 }
-                                stream.Dispose();
-                                stream.Close();
+                                finally { stream.Dispose(); stream.Close(); }
                             }
                             else errors += item.Name + "\n";
                         }
@@ -345,18 +351,6 @@ namespace Lab_4.Loaders
             }
         }
 
-        private Menu AddMenu()
-        {
-            Menu menu = new Menu()
-            {
-                Margin = new Thickness(0, 0, 0, 0),
-                VerticalAlignment = VerticalAlignment.Top,
-                Height = 21,
-                Name = "Formattions"
-            };
-            return menu;
-        }
-
         private void BtnLoadPlugin_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog() { Filter = "DLL files | *.dll" };
@@ -378,10 +372,7 @@ namespace Lab_4.Loaders
 
                     var temp = ((Grid)gr.Content).Children;                 // get all children of MainGroupBox
                     string type;
-                    try
-                    {
-                        type = ((GroupBox)temp[temp.Count - 2]).Header.ToString();   // get pre-last GroupBox Header, because last one is ButtonGroupBox
-                    }
+                    try { type = ((GroupBox)temp[temp.Count - 2]).Header.ToString(); }  // get pre-last GroupBox Header, because last one is ButtonGroupBox
                     catch { type = "Book"; }
 
                     BookLoader loader = LoaderManager.GetLoader(type);

@@ -8,16 +8,22 @@ namespace Lab_4.Helpers.Formatters
     {
         private static Dictionary<string, IFormatter> formatterDict = new Dictionary<string, IFormatter>();
 
-        private static List<MenuItem> menuItemList = new List<MenuItem>();
-
+        private static Menu menu = new Menu()
+        {
+            Margin = new Thickness(0, 0, 0, 0),
+            VerticalAlignment = VerticalAlignment.Top,
+            Height = 21,
+            Name = "Formattions"
+        };
+        
         public static void AddMenuItem(MenuItem newItem)
         {
-            menuItemList.Add(newItem);
+            menu.Items.Add(newItem);
         }
 
-        public static List<MenuItem> GetMenuItems()
+        public static Menu GetMenu()
         {
-            return menuItemList;
+            return menu;
         }
 
         public static Dictionary<string, IFormatter> GetFormatters()
@@ -32,7 +38,12 @@ namespace Lab_4.Helpers.Formatters
 
         public static bool AddFormatter(string key, IFormatter formatter, MenuItem newItem)
         {
-            try { formatterDict.Add(key, formatter); menuItemList.Add(newItem); return true; }
+            try
+            {
+                formatterDict.Add(key, formatter);
+                if (!menu.Items.Contains(newItem)) { AddMenuItem(newItem); return true; }
+                else { MessageBox.Show("It is already exists", "Can't add", MessageBoxButton.OK, MessageBoxImage.Error); return false; }
+            }
             catch { MessageBox.Show("It is already exists", "Can't add", MessageBoxButton.OK, MessageBoxImage.Error); return false; }
         }
     }

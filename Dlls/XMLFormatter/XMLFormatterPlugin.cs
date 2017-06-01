@@ -23,7 +23,7 @@ namespace Lab_4.Helpers.Formatters
 
         public MenuItem GetMenuItem()
         {
-            menuItem = new MenuItem() { Header = func };
+            menuItem = new MenuItem() { Name = func, Header = func };
             menuItem.Items.Add(new MenuItem() { Name = "Enable", Header = "Is enabled", IsCheckable = true });
             MenuItem tempItem = new MenuItem() { Name = "ChosenRules", Header = "ChooseRules" };
             tempItem.Click += new RoutedEventHandler(ChooseRules);

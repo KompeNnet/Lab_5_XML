@@ -8,7 +8,7 @@ namespace Lab_4.Helpers.Formatters
     public class XMLFormatter : IFormatter
     {
         private static string formatterRules = "";
-        private string extension = "xml";
+        private string extension = ".xml";
 
         public bool IsCompatible(string extension)
         {
