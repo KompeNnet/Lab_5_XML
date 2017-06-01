@@ -145,16 +145,31 @@ namespace Lab_4.Loaders
                 TextWriter writer = new StringWriter();
                 ISerializer serializer = SerializerManager.GetSerializer((Path.GetExtension(dlg.FileName)).Substring(1));
                 foreach (ItemInList item in bookListForm.SelectedItems) { writer.WriteLine(" : " + item.Type + " : " + serializer.Serialize(item.Data)); }
-                Menu menu = new Menu();
+
                 try
                 {
+                    Menu menu = new Menu();
                     menu = g.Children.OfType<Menu>().First(x => x.Name == "Formattions");
+                    foreach (MenuItem item in menu.Items)
+                    {
+                        MenuItem subItem = (MenuItem)item.Items[0];
+                        if (subItem.IsChecked)
+                        {
+
+                        }
+                    }
                 }
-                catch {  }
+                catch
+                {
+                    StreamWriter stream = new StreamWriter(dlg.OpenFile());
+                    stream.Write(writer);
+                    stream.Dispose();
+                    stream.Close();
+                }
                 writer.Dispose();
                 writer.Close();
             }
-        }    // selectedItems (data & type), serialize json { type: "Type", book: Object }, write in file
+        }    // selectedItems (data & type), serialize { type: "Type", book: Object }, write in file
 
         private void BtnDeserialize_Click(object sender, RoutedEventArgs e)
         {
@@ -299,7 +314,6 @@ namespace Lab_4.Loaders
                         foreach (string key in FormatterManager.GetFormatters().Keys)
                         {
                             menu.Items.Add(plugin.GetMenuItem());
-                            //TODO
                         }
                     }
                 }
